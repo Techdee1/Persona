@@ -1241,20 +1241,20 @@ Algorithm:
 Output:
 ```json
 {
-  "test_size": 1240,
-  "persona_rmse": 0.71,
-  "baseline_rmse": 0.89,
-  "rmse_improvement": 0.18,
-  "rouge_l": 0.14,
+  "test_size": 1102,
+  "persona_rmse": 1.08,
+  "baseline_rmse": 1.11,
+  "rmse_improvement": 0.03,
+  "rouge_l": 0.31,
   "breakdown": {
     "by_history_length": {
-      "sparse": {"rmse": 0.81, "users": 120},
-      "medium": {"rmse": 0.68, "users": 890},
-      "dense":  {"rmse": 0.61, "users": 230}
+      "sparse": {"rmse": 1.23, "users": 186},
+      "medium": {"rmse": 1.13, "users": 463},
+      "dense":  {"rmse": 1.03, "users": 453}
     },
     "by_cultural_signal": {
-      "with_nigerian_english":    {"rmse": 0.65, "users": 310},
-      "without_nigerian_english": {"rmse": 0.74, "users": 930}
+      "with_nigerian_english":    {"rmse": 0.97, "users": 81},
+      "without_nigerian_english": {"rmse": 1.12, "users": 1021}
     }
   }
 }
@@ -1318,15 +1318,15 @@ Output:
 ```json
 {
   "full_model": {
-    "task_a": {"rmse": 0.71, "rouge_l": 0.14},
-    "task_b": {"ndcg": 0.23, "hit_rate": 0.41}
+    "task_a": {"rmse": 1.08, "rouge_l": 0.31},
+    "task_b": {"ndcg": null, "hit_rate": null}
   },
   "ablations": {
     "cultural_signals": {
-      "task_a":       {"rmse": 0.79, "rouge_l": 0.11},
-      "task_a_delta": {"rmse_delta": 0.08, "rouge_l_delta": -0.03},
-      "task_b":       {"ndcg": 0.18, "hit_rate": 0.35},
-      "task_b_delta": {"ndcg_delta": -0.05, "hit_rate_delta": -0.06}
+      "task_a":       {"rmse": 1.09, "rouge_l": 0.26},
+      "task_a_delta": {"rmse_delta": 0.01, "rouge_l_delta": -0.05},
+      "task_b":       {"ndcg": null, "hit_rate": null},
+      "task_b_delta": {"ndcg_delta": null, "hit_rate_delta": null}
     },
     ...
   }
