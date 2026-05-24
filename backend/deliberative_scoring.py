@@ -1,3 +1,18 @@
+"""
+Deliberative scoring: reranks semantically retrieved candidates using the user's
+preference axes and optional penalty constraints.
+
+Scoring formula per candidate c:
+  final_score(c) = cosine_sim(query, c)
+                 + Σ axis.weight   for each axis whose name is a key in c.metadata
+                 − Σ penalty.value for each penalty key found in c.metadata
+
+The axis boost is intentionally coarse (key presence, not value similarity) so it
+remains fast and interpretable. A future improvement is to use embedding similarity
+between axis names and metadata values for softer matches.
+
+Every candidate receives a human-readable explanation for UI display and auditability.
+"""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -20,15 +35,17 @@ def deliberative_score(
     axes: List[PreferenceAxis],
     penalties: Dict[str, float] | None = None,
 ) -> List[ScoredRecommendation]:
+    """Apply preference axis boosts and penalty deductions, then sort descending."""
     penalties = penalties or {}
     scored: List[ScoredRecommendation] = []
 
     for candidate in candidates:
-        # Boost only when the axis name appears as a key in the item's metadata.
+        # Axis boost: fires when an axis name exists as a key in the item's metadata.
+        # e.g., metadata={"food": "jollof rice..."} triggers the "food" axis.
         axis_score = sum(
             axis.weight for axis in axes if axis.name in candidate.metadata
         )
-        # Penalise only when the penalty key appears in the item's metadata.
+        # Penalty deduction: fires when a penalty key exists in the item's metadata.
         penalty_score = sum(
             value for key, value in penalties.items() if key in candidate.metadata
         )

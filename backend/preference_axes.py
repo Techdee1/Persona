@@ -1,3 +1,25 @@
+"""
+Preference axis extraction: translates a PsychologicalProfile into a ranked list
+of PreferenceAxis objects used by the deliberative scorer.
+
+Three axis families:
+
+  Value axes (food / service / price / atmosphere):
+    Derived from value_keyword mention counts in the user's review history.
+    weight = count / total_mentions  →  a user mentioning food 8/10 times gets weight=0.8.
+
+  Rating bias axis:
+    Fires when |mean − 3.0| ≥ 0.5 (user is meaningfully generous or harsh).
+    weight = min(|mean − 3.0| / 2, 1.0)
+    Used to surface items whose star ratings align with the user's calibration.
+
+  Cultural register axis:
+    Fires when code_switching_detected=True (Nigerian English / pidgin detected).
+    weight = min(nigerian_english_index × 10, 1.0)
+    Surfaces items whose review corpora contain Nigerian cultural markers.
+
+Axes are sorted by weight descending so the highest-signal dimensions dominate scoring.
+"""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -8,6 +30,7 @@ from .profile import PsychologicalProfile, profile_from_dict
 
 @dataclass(frozen=True)
 class PreferenceAxis:
+    """A single preference dimension with its reranking weight and a human-readable rationale."""
     name: str
     rationale: str
     weight: float

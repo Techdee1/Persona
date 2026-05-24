@@ -1,3 +1,24 @@
+"""
+Task B agentic recommendation service.
+
+Entry point for the POST /task-b/agent endpoint. Coordinates two execution paths:
+
+  Deterministic path (default, use_llm=False):
+    _deterministic_plan() builds the 4-step ToolCall list directly.
+    No LLM required. Sub-400ms end-to-end. Fully reproducible.
+
+  LLM planning path (use_llm=True, requires ENABLE_LLM + OPENAI_API_KEY):
+    GPT-4o is asked to produce a tool-call plan. The LLM's ordering decisions
+    are honoured where possible, but its plan is mapped back to the deterministic
+    ToolCall objects (which carry the correct pre-wired data). Any steps the LLM
+    omits are appended in the required execution order — guaranteeing all four
+    steps always run regardless of what the LLM returns.
+
+Both paths run through AgentOrchestrator.run_agent(), which resolves $ref argument
+wiring and records every step for the response trace.
+
+See AGENTS.md for the full pipeline design and data flow diagram.
+"""
 from __future__ import annotations
 
 from typing import Dict, List, Optional
