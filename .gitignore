@@ -17,6 +17,17 @@ data/*.gz
 *.docx
 AfriForge_PRD.pdf
 
+# Internal development files (not for submission)
+docs/PROGRESS.md
+docs/PRD-Backend-AIML.md
+docs/PRD-Frontend.md
+docs/Backend-AIML-Phases.md
+docs/DigitalOcean-Deployment.md
+docs/build_pdfs.py
+backend/enrich_vector_store.py
+backend/upload_store.py
+ingest_checkpoints.py
+
 # SSH keys
 key
 key.pub
