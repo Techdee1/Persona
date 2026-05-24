@@ -65,7 +65,7 @@ export default function About() {
           <Arrow />
           <ArchBox title="FastAPI" sub="Port 8000" accent="#F59E0B" />
           <Arrow />
-          <ArchBox title="Vector Store" sub="50k Yelp businesses" accent="#22C55E" />
+          <ArchBox title="Vector Store" sub="200k Yelp businesses" accent="#22C55E" />
         </div>
       </div>
 
