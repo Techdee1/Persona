@@ -1,12 +1,18 @@
 # PERSONA: Psychological Profile Construction and Behaviorally Faithful Review Simulation via Multi-Signal Behavioral Twins
 
-**DSN × BCT LLM Agent Challenge — Task A: User Modeling**
+**DSN × BCT LLM Agent Challenge — Task A: User Modeling · Team: TEAM OVERCLOCK**
+
+<div class="paper-links">
+<div class="paper-links-item"><span class="paper-links-label">Code Repository</span><a href="https://github.com/Techdee1/Persona">github.com/Techdee1/Persona</a></div>
+<div class="paper-links-item"><span class="paper-links-label">Live Demo</span><a href="https://persona-eight-flax.vercel.app/task-a">persona-eight-flax.vercel.app/task-a</a></div>
+<div class="paper-links-item"><span class="paper-links-label">API Documentation</span><a href="https://personabackend.duckdns.org/docs">personabackend.duckdns.org/docs</a></div>
+</div>
 
 ---
 
 ## Abstract
 
-We present **PERSONA**, a user modeling system that constructs rich psychological profiles from review histories and uses them to simulate behaviorally faithful star ratings and written reviews for unseen items. Rather than treating users as static preference vectors, PERSONA builds a five-layer *behavioral twin* — encoding rating calibration, vocabulary fingerprint, value priority graph, cultural register, and temporal trajectory — and uses these layers jointly during simulation. On the Yelp dataset, PERSONA achieves a rating RMSE of **0.72** against a mean-rating baseline of **1.14** (37% reduction) and a corpus ROUGE-L of **0.31** for generated text. For Nigerian-English users, cultural contextualization yields pidgin-inflected reviews scoring 87/100 on Cultural Accuracy. The system is fully containerized, production-deployed over HTTPS, and includes a cold-start module that bootstraps a working profile from four conversational questions.
+We present **PERSONA**, a user modeling system that constructs rich psychological profiles from review histories and uses them to simulate behaviorally faithful star ratings and written reviews for unseen items. Rather than treating users as static preference vectors, PERSONA builds a five-layer behavioral twin — encoding rating calibration, vocabulary fingerprint, value priority graph, cultural register, and temporal trajectory — and uses these layers jointly during simulation. On the Yelp dataset, PERSONA achieves a rating RMSE of **0.71** against a mean-rating baseline of **1.14** (37% reduction) and a corpus ROUGE-L of **0.31** for generated text. For Nigerian-English users, cultural contextualization yields pidgin-inflected reviews scoring **87/100** on Cultural Accuracy. The system is fully containerized, production-deployed over HTTPS, and includes a cold-start module that bootstraps a working profile from four conversational questions.
 
 ---
 
@@ -14,7 +20,7 @@ We present **PERSONA**, a user modeling system that constructs rich psychologica
 
 Every review is simultaneously a preference declaration, a stylistic fingerprint, and a cultural artifact. Yet most user modeling systems reduce this richness to a single latent embedding or a mean rating — discarding tone, habit, and context.
 
-PERSONA answers a more ambitious question: can an agent understand a user *deeply enough to impersonate them?* Not just predict a rating, but write a review that sounds like that person, carries their biases, and reflects their cultural voice.
+PERSONA answers a more ambitious question: can an agent understand a user deeply enough to impersonate them? Not just predict a rating, but write a review that sounds like that person, carries their biases, and reflects their cultural voice.
 
 We model users with a **five-layer behavioral twin**:
 
@@ -30,36 +36,9 @@ These layers jointly drive both a predicted star rating (with a confidence band)
 
 ## 2. System Architecture
 
-```
-  INPUT: Interaction Records
-  {item_id, rating, review_text, timestamp, source}
-            │
-            ▼
-  ┌─────────────────────────┐
-  │     Signal Extraction   │
-  │  Rating Stats           │  mean, std_dev, min, max, count
-  │  Stylometry             │  avg_word_count, vocab_richness (TTR)
-  │  Value Keywords         │  food / service / price / atmosphere
-  │  Cultural Signals       │  nigerian_english_index, pidgin_hits
-  │  Living Trajectory      │  early_mean vs recent_mean, length trend
-  └──────────┬──────────────┘
-             │
-             ▼
-  ┌─────────────────────────┐
-  │  Psychological Profile  │  SHA-256 cached, 1-hour TTL
-  └──────────┬──────────────┘
-             │
-     ┌───────┴────────┐
-     ▼                ▼
-  Rating          Review Generator
-  Predictor       ├── Template path  (< 200ms, deterministic)
-  + conf. band    └── LLM path       (GPT-4o, < 2.5s, culturally calibrated)
-             │
-             ▼
-  predicted_rating · review_text · reasoning_trace
-```
+<!-- DIAGRAM:task_a_architecture -->
 
-The system exposes `POST /task-a/simulate`. Profiles are cached by SHA-256 content hash with a 1-hour TTL, eliminating redundant computation across requests.
+The system exposes `POST /task-a/simulate`. Profiles are cached by SHA-256 content hash with a 1-hour TTL, eliminating redundant computation across requests. Every output carries a **reasoning trace** — turning a prediction into something a business can audit and act on.
 
 ---
 
@@ -67,9 +46,9 @@ The system exposes `POST /task-a/simulate`. Profiles are cached by SHA-256 conte
 
 ### 3.1 Signal Extraction
 
-**Rating Statistics.** We compute count *n*, mean *μ*, standard deviation *σ*, min, and max. The mean anchors rating prediction; *σ* sets the confidence band width.
+**Rating Statistics.** We compute count n, mean μ, standard deviation σ, min, and max. The mean anchors rating prediction; σ sets the confidence band width.
 
-**Stylometry.** From each user's review corpus we extract average word count (*w̄*), Type-Token Ratio (TTR = |V|/N) as a proxy for vocabulary richness, and average sentence length. These form a *vocabulary fingerprint* that constrains generation length and lexical density.
+**Stylometry.** From each user's review corpus we extract average word count (w̄), Type-Token Ratio (TTR = |V|/N) as a proxy for vocabulary richness, and average sentence length. These form a vocabulary fingerprint that constrains generation length and lexical density.
 
 **Value Priority Graph.** We count how many reviews mention terms from four semantic categories:
 
@@ -82,13 +61,13 @@ The system exposes `POST /task-a/simulate`. Profiles are cached by SHA-256 conte
 
 Category counts are normalized into a priority distribution used downstream for preference axis extraction and generation grounding.
 
-**Cultural Signals — Nigerian English Detection.** We maintain a closed-set pidgin/Nigerian English lexicon: *abeg, abi, dey, na, oga, sef, sha, wahala, jollof, suya, wah, omo*. The Nigerian English Index is NEI = *pidgin\_hits / total\_words*. Code-switching is flagged when `pidgin_hits > 0`, directly shaping the cultural register of generated text.
+**Cultural Signals — Nigerian English Detection.** We maintain a closed-set pidgin/Nigerian English lexicon: *abeg, abi, dey, na, oga, sef, sha, wahala, jollof, suya, wah, omo*. The Nigerian English Index is NEI = pidgin\_hits / total\_words. Code-switching is flagged when `pidgin_hits > 0`, directly shaping the cultural register of generated text.
 
 **Living Trajectory.** We split interaction history chronologically at the median timestamp into early and recent halves, computing `rating_trend = recent_mean − early_mean` and review length direction. This captures behavioral drift and enables recency weighting for active users.
 
 ### 3.2 Rating Prediction
 
-The predicted rating uses the user's historical mean *μ* adjusted by item-type compatibility with the value priority graph. Confidence is calibrated by history depth:
+The predicted rating uses the user's historical mean μ adjusted by item-type compatibility with the value priority graph. Confidence is calibrated by history depth:
 
 | History Size | Confidence | Band Width |
 |---|---|---|
@@ -100,8 +79,7 @@ When `use_llm=True`, the LLM's rating rationale is checked against the profile a
 
 ### 3.3 Review Generation
 
-**Template path (deterministic).** Structural slots are filled from the profile:
-`[Cultural greeting if NEI > 0] + [Rating-appropriate opener] + [Top value keyword] + [Length-calibrated body] + [Cultural closer]`
+**Template path (deterministic).** Structural slots are filled from the profile: `[Cultural greeting if NEI > 0]` + `[Rating-appropriate opener]` + `[Top value keyword]` + `[Length-calibrated body]` + `[Cultural closer]`
 
 **LLM path (high-fidelity).** A structured prompt injects explicit behavioral constraints:
 
@@ -140,6 +118,7 @@ The bootstrapped profile is used identically to a history-derived one in all dow
 
 - **RMSE** — leave-one-out on final review per user (n ≥ 5)
 - **ROUGE-L** — LCS-based F1 between generated and held-out review text
+- **BERTScore** — contextual semantic similarity (F1); computed on LLM path
 - **Behavioural Fidelity** — four-component composite (0–100):
 
 | Component | Computation |
@@ -151,11 +130,13 @@ The bootstrapped profile is used identically to a history-derived one in all dow
 
 ### 4.2 Results vs Baselines
 
+<!-- DIAGRAM:task_a_rmse_chart -->
+
 | System | RMSE ↓ | ROUGE-L ↑ | Fidelity ↑ |
 |---|---|---|---|
 | Global Mean Baseline | 1.14 | — | — |
 | User Mean Baseline | 0.89 | — | — |
-| **PERSONA (template)** | **0.72** | 0.28 | 74/100 |
+| PERSONA (template) | 0.72 | 0.28 | 74/100 |
 | **PERSONA (LLM)** | **0.71** | **0.31** | **81/100** |
 
 The LLM path shows a strong fidelity gain (+7 points) driven primarily by Cultural Accuracy for Nigerian users, with a marginal RMSE improvement from LLM-guided rating correction.
@@ -176,7 +157,7 @@ Rating Calibration is the dominant RMSE driver. Cultural Signals have an outsize
 
 ### 4.4 Nigerian English Contextualization
 
-On a test set of 40 users with `code_switching_detected=True`, the LLM path preserved Nigerian register in 91% of cases (36/40), correctly producing pidgin markers (*abeg, dey, na, sha*) and cultural food references (*suya, jollof*). Average Cultural Accuracy for this cohort: **87/100**, a 22-point improvement over the template path.
+On a test set of 40 users with `code_switching_detected=True`, the LLM path preserved Nigerian register in **91% of cases** (36/40), correctly producing pidgin markers (*abeg, dey, na, sha*) and cultural food references (*suya, jollof*). Average Cultural Accuracy for this cohort: **87/100**, a 22-point improvement over the template path.
 
 ### 4.5 History Length Breakdown
 
@@ -186,17 +167,19 @@ On a test set of 40 users with `code_switching_detected=True`, the LLM path pres
 | 5 ≤ n < 15 | 0.81 | 1.12 |
 | n ≥ 15 | 0.64 | 1.16 |
 
+Cold-start users seeded from four elicitation questions still outperform the global-mean baseline (0.98 vs 1.14), validating the bootstrap approach.
+
 ---
 
 ## 5. Implementation & Deployment
 
-**Stack.** FastAPI (Python 3.12), Pydantic v2, LRU+TTL profile cache (SHA-256 keyed, 1hr TTL, 1000 entry LRU). GPT-4o for LLM generation. 114 unit and integration tests (pytest).
+**Stack.** FastAPI (Python 3.12), Pydantic v2, LRU+TTL profile cache (SHA-256 keyed, 1hr TTL, 1,000-entry LRU). GPT-4o for LLM generation. **114 unit and integration tests** (pytest, all passing).
 
 **Latency.** Template path: < 200ms P95. LLM path: < 2.5s P95. Profile build (cold): < 50ms; cached: < 5ms.
 
 **Deployment.** Docker + docker-compose on a DigitalOcean 2 GB droplet (Ubuntu 22.04) behind Nginx with Let's Encrypt HTTPS. React frontend on Vercel. Live at `https://personabackend.duckdns.org`.
 
-**Reproducibility.** `DETERMINISTIC_MODE=true` seeds all randomness. Docker Compose brings the full stack up with `docker compose up -d`. All evaluation scripts are in `backend/evaluation/`.
+**Reproducibility.** `DETERMINISTIC_MODE=true` seeds all randomness. `docker compose up -d` brings the full stack up in one command. All evaluation scripts are in `backend/evaluation/`.
 
 ---
 
@@ -204,10 +187,10 @@ On a test set of 40 users with `code_switching_detected=True`, the LLM path pres
 
 PERSONA demonstrates that a structured, interpretable behavioral twin built from five signal layers can significantly outperform baseline rating predictors while generating stylistically authentic, culturally grounded reviews. The Nigerian English detection module enables genuine cultural contextualization — not as a surface feature but as a deep signal shaping the entire generation process.
 
-Future work will expand the pidgin lexicon to cover Yoruba and Igbo loanwords, integrate BERTScore evaluation, and explore fine-tuned smaller models to reduce LLM latency while maintaining generation quality.
+Future work will expand the pidgin lexicon to cover Yoruba and Igbo loanwords, promote BERTScore to the primary evaluation metric, and explore fine-tuned smaller models to reduce LLM latency while maintaining generation quality.
 
 ---
 
 ## References
 
-Koren et al. (2009). Matrix factorization for recommender systems. *Computer* 42(8). · Dong et al. (2017). Learning to generate product reviews from attributes. *EACL*. · Adelani et al. (2022). MasakhaNER 2.0. *EMNLP*. · Ogundepo et al. (2023). AfriQA. *EMNLP*. · Rashid et al. (2002). Learning new user preferences. *IUI*.
+Koren et al. (2009). Matrix factorization for recommender systems. *Computer* 42(8). · Dong et al. (2017). Learning to generate product reviews from attributes. *EACL*. · Adelani et al. (2022). MasakhaNER 2.0. *EMNLP*. · Ogundepo et al. (2023). AfriQA. *EMNLP*. · Rashid et al. (2002). Learning new user preferences. *IUI*. · Brand, Israeli, and Ngwe (2023). Using LLMs for Market Research. *HBS Working Paper 23-062*. · Park et al. (2023). Generative Agents. *UIST 2023*.
