@@ -13,7 +13,7 @@ function detectPidginTerms(text) {
   return PIDGIN_TERMS.filter(term => new RegExp(`\\b${term}\\b`, 'i').test(text));
 }
 
-function MetricBar({ label, value, delay }) {
+function MetricBar({ label, sublabel, value, delay }) {
   const barRef = useRef(null);
   const color = value >= 80 ? '#22C55E' : value >= 60 ? '#F59E0B' : '#EF4444';
 
@@ -26,20 +26,25 @@ function MetricBar({ label, value, delay }) {
   }, [value, delay]);
 
   return (
-    <div className="flex items-center gap-2.5 mb-2.5">
-      <span className="text-xs text-[#64748B] w-32 shrink-0">{label}</span>
-      <div className="flex-1 h-1.5 bg-[#1E1E2E] rounded-sm overflow-hidden">
-        <div
-          ref={barRef}
-          className="h-full rounded-sm"
-          style={{
-            background: color,
-            width: reduced ? `${value}%` : '0%',
-            transition: reduced ? 'none' : 'width 0.6s ease-out',
-          }}
-        />
+    <div className="mb-3">
+      <div className="flex items-start gap-2.5 mb-1">
+        <div className="w-32 shrink-0">
+          <div className="text-xs text-[#64748B]">{label}</div>
+          {sublabel && <div className="text-[9px] text-[#475569] leading-tight mt-0.5">{sublabel}</div>}
+        </div>
+        <div className="flex-1 h-1.5 bg-[#1E1E2E] rounded-sm overflow-hidden mt-1">
+          <div
+            ref={barRef}
+            className="h-full rounded-sm"
+            style={{
+              background: color,
+              width: reduced ? `${value}%` : '0%',
+              transition: reduced ? 'none' : 'width 0.6s ease-out',
+            }}
+          />
+        </div>
+        <span className="text-xs w-8 text-right shrink-0" style={{ fontFamily: 'JetBrains Mono, monospace', color }}>{value}</span>
       </div>
-      <span className="text-xs w-8 text-right shrink-0" style={{ fontFamily: 'JetBrains Mono, monospace', color }}>{value}</span>
     </div>
   );
 }
@@ -84,12 +89,12 @@ export default function FidelityDashboard({ profile, output }) {
       </div>
 
       {[
-        { label: 'Tone Match', value: toneMatch },
-        { label: 'Rating Consistency', value: ratingConsistency },
-        { label: 'Cultural Accuracy', value: culturalAccuracy },
-        { label: 'Length Fidelity', value: lengthFidelity },
+        { label: 'Tone Match',          sublabel: 'vocab richness vs profile baseline', value: toneMatch },
+        { label: 'Rating Consistency',  sublabel: 'predicted vs user mean ± std dev',   value: ratingConsistency },
+        { label: 'Cultural Accuracy',   sublabel: 'Nigerian register alignment',         value: culturalAccuracy },
+        { label: 'Length Fidelity',     sublabel: 'word count vs avg review length',     value: lengthFidelity },
       ].map((m, i) => (
-        <MetricBar key={m.label} label={m.label} value={m.value} delay={i * 100} />
+        <MetricBar key={m.label} label={m.label} sublabel={m.sublabel} value={m.value} delay={i * 100} />
       ))}
 
       {detectedTerms.length > 0 && (

@@ -1,7 +1,11 @@
 export const DEMO_USERS = {
   demo_generous: {
     label: 'demo_generous',
-    description: 'Generous rater — Nigerian English, food-focused, detailed reviews',
+    displayName: 'The Enthusiast',
+    description: 'Generous rater · Nigerian English · food-focused',
+    avgRating: '4.5★',
+    reviewCount: 15,
+    accent: '#22C55E',
     records: [
       { item_id: 'chicken_republic_vi', rating: 5, review_text: 'Abeg this place never disappoint! The grilled chicken na top tier, e don do for me. Service was fast and the portion size generous. Will definitely come back.', timestamp: '2024-01-10', source: 'yelp' },
       { item_id: 'mama_cass_lekki', rating: 5, review_text: 'Na wa o, Mama Cass still holding it down. The jollof rice was smoky and perfect. Egusi soup was rich and thick. This is authentic Nigerian food at its finest.', timestamp: '2024-01-22', source: 'yelp' },
@@ -22,7 +26,11 @@ export const DEMO_USERS = {
   },
   demo_critic: {
     label: 'demo_critic',
-    description: 'Critical rater — values service and price, short reviews',
+    displayName: 'The Critic',
+    description: 'Critical rater · values service & price',
+    avgRating: '2.8★',
+    reviewCount: 10,
+    accent: '#EF4444',
     records: [
       { item_id: 'chicken_republic_vi', rating: 3, review_text: 'Average food, overpriced for what you get. Service was slow. Expected better.', timestamp: '2024-01-15', source: 'yelp' },
       { item_id: 'kfc_ikeja', rating: 2, review_text: 'Cold chicken, rude staff. Not worth the price. Will not return.', timestamp: '2024-02-01', source: 'yelp' },
@@ -38,7 +46,11 @@ export const DEMO_USERS = {
   },
   demo_newuser: {
     label: 'demo_newuser',
-    description: 'New user — no review history (triggers cold-start)',
+    displayName: 'New User',
+    description: 'No history · triggers cold-start flow',
+    avgRating: '—',
+    reviewCount: 0,
+    accent: '#6366F1',
     records: [],
   },
 };

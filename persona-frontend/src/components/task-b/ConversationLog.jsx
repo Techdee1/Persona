@@ -3,12 +3,29 @@ const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 function pad(n) { return String(n).padStart(2, '0'); }
 function fmt(d) { return `${pad(d.getHours())}:${pad(d.getMinutes())}`; }
 
-export default function ConversationLog({ turns, onClear }) {
+export default function ConversationLog({ turns, onClear, isColdStartSession = false, agentMode = false }) {
   if (!turns.length) return null;
 
   return (
     <div className="bg-[#13131A] border border-[#1E1E2E] rounded-xl p-5 mb-4">
-      <div className="text-[10px] text-[#64748B] uppercase tracking-widest mb-3.5">Conversation</div>
+      <div className="flex items-center justify-between mb-3.5">
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] text-[#64748B] uppercase tracking-widest">Conversation</span>
+          {isColdStartSession && (
+            <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold"
+              style={{ background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.4)', color: '#818CF8' }}>
+              Cold-start session
+            </span>
+          )}
+          {agentMode && (
+            <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold"
+              style={{ background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.3)', color: '#6366F1' }}>
+              Agent
+            </span>
+          )}
+        </div>
+        <span className="text-[10px] text-[#64748B]">{turns.length} turn{turns.length !== 1 ? 's' : ''}</span>
+      </div>
 
       <div className="relative">
         <div className="absolute left-[5px] top-2 bottom-6 w-0.5 bg-[#1E1E2E] rounded-sm" />

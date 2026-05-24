@@ -4,6 +4,20 @@ import { useToast } from '../layout/Toast';
 
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+const OPTION_LABELS = {
+  top_marks:            '⭐ I give full marks freely',
+  reserve_top:          '🎯 I reserve top ratings for the best',
+  food_quality:         '🍽️ Food quality',
+  service:              '🤝 Service',
+  price_value:          '💰 Price & value',
+  atmosphere:           '✨ Atmosphere',
+  brief_and_direct:     '✍️ Brief and direct',
+  detailed_and_thorough:'📝 Detailed and thorough',
+  yes_often:            '🇳🇬 Yes, often',
+  sometimes:            'Sometimes',
+  rarely:               'Rarely or never',
+};
+
 export default function ColdStartChat({ onProfileBuilt }) {
   const { showToast } = useToast();
   const [questions, setQuestions] = useState([]);
@@ -77,22 +91,25 @@ export default function ColdStartChat({ onProfileBuilt }) {
   }
 
   const q = questions[current];
-  const progress = (current / questions.length) * 100;
+  // #10: progress uses current + 1 so bar fills as each question is answered
+  const progress = ((current + 1) / questions.length) * 100;
 
   return (
     <div className="p-1">
+      {/* Progress bar */}
       <div className="mb-4">
         <div className="flex justify-between mb-1.5">
           <span className="text-[11px] text-[#64748B]">Question {current + 1} of {questions.length}</span>
         </div>
-        <div className="h-1 bg-[#1E1E2E] rounded-sm overflow-hidden">
+        <div className="h-1 bg-[#1E1E2E] rounded-full overflow-hidden">
           <div
-            className="h-full bg-[#6366F1] rounded-sm"
-            style={{ width: `${progress}%`, transition: reduced ? 'none' : 'width 0.4s ease' }}
+            className="h-full bg-[#6366F1] rounded-full"
+            style={{ width: `${progress}%`, transition: reduced ? 'none' : 'width 300ms ease' }}
           />
         </div>
       </div>
 
+      {/* Question bubble */}
       <div
         className="bg-[#13131A] border border-[#1E1E2E] rounded-tr-xl rounded-br-xl rounded-bl-xl px-3.5 py-3 text-sm text-[#F8FAFC] mb-3.5"
         style={{ animation: reduced ? 'none' : 'fadeSlideIn 0.3s ease' }}
@@ -100,6 +117,7 @@ export default function ColdStartChat({ onProfileBuilt }) {
         {q.question}
       </div>
 
+      {/* Option chips with human-readable labels */}
       <div className="flex flex-wrap gap-2">
         {q.options.map(opt => {
           const isSelected = selected === opt;
@@ -117,7 +135,7 @@ export default function ColdStartChat({ onProfileBuilt }) {
               }}
             >
               {isSelected && <span>✓</span>}
-              {opt}
+              {OPTION_LABELS[opt] ?? opt}
             </button>
           );
         })}
