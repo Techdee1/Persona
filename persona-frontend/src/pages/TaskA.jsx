@@ -20,15 +20,6 @@ const PLACE_SUGGESTIONS = [
   { name: 'Mama Cass Victoria Island', description: 'Traditional Nigerian food', categories: 'Nigerian, Traditional', price_range: 'Budget' },
 ];
 
-// Maps trace clause keywords to profile layer labels
-const TRACE_LAYER_MAP = [
-  { pattern: /rating|star|score|mean|calibrat/i,   label: 'Rating Calibration',   color: '#F59E0B' },
-  { pattern: /cultural|nigerian|pidgin|code.switch/i, label: 'Cultural Signal',    color: '#22C55E' },
-  { pattern: /trajector|drift|trend|recent/i,       label: 'Trajectory',           color: '#6366F1' },
-  { pattern: /style|vocab|word|length|sentence/i,   label: 'Stylometry',           color: '#818CF8' },
-  { pattern: /keyword|food|service|price|atmospher/i, label: 'Value Keywords',     color: '#F59E0B' },
-];
-
 function SectionHeader({ num, label }) {
   return (
     <div className="flex items-center gap-2.5 mb-3.5">

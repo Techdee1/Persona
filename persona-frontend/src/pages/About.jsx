@@ -51,9 +51,38 @@ const TASK_B_CRITERIA = [
 export default function About() {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10 md:py-12">
-      <h1 className="font-bold text-[#F8FAFC] text-center mb-10 tracking-tight" style={{ fontSize: 'clamp(24px, 4vw, 40px)' }}>
+      <h1 className="font-bold text-[#F8FAFC] text-center mb-6 tracking-tight" style={{ fontSize: 'clamp(24px, 4vw, 40px)' }}>
         How Persona Works
       </h1>
+
+      {/* Solution paper downloads */}
+      <div className="flex flex-col sm:flex-row gap-3 mb-10 justify-center">
+        {[
+          { label: 'Task A Solution Paper', file: '/PERSONA_Task_A_Solution_Paper.pdf', color: '#F59E0B' },
+          { label: 'Task B Solution Paper', file: '/PERSONA_Task_B_Solution_Paper.pdf', color: '#6366F1' },
+        ].map(({ label, file, color }) => (
+          <a
+            key={file}
+            href={file}
+            download
+            aria-label={`Download ${label}`}
+            className="flex items-center gap-2.5 px-4 py-3 rounded-xl border no-underline transition-all duration-200 group"
+            style={{ background: `${color}10`, borderColor: `${color}40` }}
+            onMouseEnter={e => { e.currentTarget.style.background = `${color}20`; e.currentTarget.style.borderColor = color; }}
+            onMouseLeave={e => { e.currentTarget.style.background = `${color}10`; e.currentTarget.style.borderColor = `${color}40`; }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            <div>
+              <div className="text-xs font-semibold" style={{ color }}>{label}</div>
+              <div className="text-[10px] text-[#64748B]">PDF · Solution paper</div>
+            </div>
+          </a>
+        ))}
+      </div>
 
       {/* Architecture */}
       <div className="mb-10">
